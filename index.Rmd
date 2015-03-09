@@ -11,16 +11,75 @@ mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
 ---
 
-## Read-And-Delete
+## Did passenger survive Titanic sinking
 
-1. Edit YAML front matter
-2. Write using R Markdown
-3. Use an empty line followed by three dashes to separate slides!
+![Animal classification](./assets/img/animal-class-example.png)
 
---- .class #id 
+Let's see if we can build a decision tree that replicates this tree (without 
+simply copying it).
 
-## Slide 2
+Illustration from [Bob Ridge](http://ridge.icu.ac.jp/gen-ed/classif.html)
 
+--- 
 
+## Titanic passenger features
+http://en.wikipedia.org/wiki/Decision_tree_learning
 
+    Name                                                    Sex  Age  SibSp      Fate 
+    ----                                                    ---  ---  -----      ----
+    Andersson, Miss. Erna Alexandra                      female   17      4  survived
+    Asplund, Master. Edvin Rojj Felix                      male    3      4  survived
+    Asplund, Miss. Lillian Gertrud                       female    5      4  survived
+    Braund, Mr. Owen Harris                                male   22      1      died
+    Cumings, Mrs. John Bradley (Florence Briggs Thayer)  female   38      1  survived
+    Fortune, Mr. Charles Alexander                         male   19      3      died
+    Palsson, Master. Gosta Leonard                         male    2      3      died
+    Sandstrom, Miss. Marguerite Rut                      female    4      1  survived
 
+---
+
+## Possible splits
+Current entropy
+
+    -(5 * P(survived) * log_2(P(survived)) + 3 * P(died) * log_2(P(died))
+  = -(5 * 5/8 * log_2(5/8) + 3 * 3/8 * log_2(3/8))
+  
+```{r}
+-(5 * 1/8 * log2(5/8) + 3 * 1/8 * log2(3/8))
+```
+
+---
+
+## Split on sex
+
+    female: SSSS
+      male: SDDD
+
+```{r}
+femaleEntropy = 0.0 # (since all have the same value)
+```
+    male entropy = -(P(S) * log2(P(S)) + 3 * P(D) * log2(P(D)))
+                 = -(1/4 * log2(1/4) + 3 * 3/4 * log2(3/4))
+```{r}
+maleEntropy <- -(1/4 * log2(1/4) + 3 * 3/4 * log2(3/4))
+```
+Total entropy
+```{r}
+(femaleEntropy + maleEntropy) / 2.0
+```
+
+## Split on age
+
+    <= 18: SSSDS
+     > 18: DSD
+     
+    <= 18 entropy = -(3 * P(S) * log2(P(S)) + 1 * P(D) * log2(P(D)))
+    
+```{r}
+le18Entropy <- -(3 * 4/5 + log2(4/5) + 1 * 1/5 * log2(1/5))
+```
+
+    > 18 entropy = -(1 * P(S) * log2(P(S)) + 2 * P(D) * log2(P(D)))
+    
+```{r}
+g18Entropy = -()
